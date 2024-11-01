@@ -6,10 +6,10 @@ type SearchParams struct {
 }
 
 type ShowsSearchResult []struct {
-	Show ShowResult `json:"show"`
+	Show Show `json:"show"`
 }
 
-type ShowResult struct {
+type Show struct {
 	ID        int           `json:"id"`
 	Name      string        `json:"name"`
 	Externals ShowExternals `json:"externals"`

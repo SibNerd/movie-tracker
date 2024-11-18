@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"movietracker/internal/config"
 	"movietracker/internal/db/cockroach"
 	"movietracker/internal/repository"
@@ -8,27 +9,31 @@ import (
 
 	"github.com/caarlos0/env/v11"
 	"github.com/kataras/iris/v12"
+	"github.com/sirupsen/logrus"
 )
 
 type App struct {
-	app *iris.Application
-	svc *service.Service
+	app    *iris.Application
+	svc    *service.Service
+	config config.Config
+	logger *logrus.Logger
 }
 
 func NewApp() App {
-	//logger := log.New()
+	logger := logrus.New()
 
 	var cfg config.Config
 	err := env.Parse(&cfg)
 	if err != nil {
-		panic("failed to parse config file")
-		//logger.Panic(err)
+		newErr := fmt.Errorf("failed to parse config file: %e", err)
+		logger.Panic(newErr)
 	}
 	app := iris.New()
 
-	db, err := cockroach.ConnectDB()
+	db, err := cockroach.ConnectDB(cfg.DatabaseDSN)
 	if err != nil {
-		panic("failed to parse config file")
+		newErr := fmt.Errorf("failed to connect to DB: %e", err)
+		logger.Panic(newErr)
 	}
 
 	searcher := repository.NewSearchRepository(cfg.SearcherURL)
@@ -37,11 +42,14 @@ func NewApp() App {
 	service.NewServiceHandler(app, svc)
 
 	return App{
-		app: app,
-		svc: svc,
+		app:    app,
+		svc:    svc,
+		config: cfg,
+		logger: logger,
 	}
 }
 
 func (a *App) Run() {
-	a.app.Listen(":8080")
+	url := a.config.Host + ":" + a.config.Port
+	a.logger.Fatal(a.app.Listen(url))
 }

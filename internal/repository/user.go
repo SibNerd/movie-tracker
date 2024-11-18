@@ -81,8 +81,17 @@ func (ur *UserRepository) AddShowToList(show entity.UserShow) error {
 	return nil
 }
 
-func (ur *UserRepository) RateShow(userId string, showId, rating int) error {
-	err := ur.db.RateShow(userId, showId, rating)
+func (ur *UserRepository) RateShow(userId, showId string, rating int) error {
+	user, err := uuid.Parse(userId)
+	if err != nil {
+		return err
+	}
+	show, err := uuid.Parse(showId)
+	if err != nil {
+		return err
+	}
+
+	err = ur.db.RateShow(user, show, rating)
 	if err != nil {
 		return err
 	}

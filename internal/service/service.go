@@ -20,8 +20,8 @@ type UserRepository interface {
 	AddShowToList(show entity.UserShow) error
 	GetUserWatchlist(userId uuid.UUID) ([]entity.UserShow, error)
 	AddShowToWatchlist(show entity.UserSingleShow) error
-	RateShow(userId string, showId, rating int) error
-	MarkAsWatched(userId string, showId int) error
+	RateShow(userId, showId string, rating int) error
+	MarkShowAsWatched(show entity.UserSingleShow) error
 }
 
 type Service struct {

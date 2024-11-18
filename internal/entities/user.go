@@ -10,6 +10,7 @@ type User struct {
 }
 
 type UserShow struct {
+	ID          uuid.UUID `json:"id"`
 	UserID      uuid.UUID `json:"userID"`
 	ShowID      uuid.UUID `json:"showID"`
 	IsWatched   bool      `json:"isWatched"`

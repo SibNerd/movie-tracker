@@ -2,6 +2,7 @@ package app
 
 import (
 	"movietracker/internal/config"
+	"movietracker/internal/db/cockroach"
 	"movietracker/internal/repository"
 	"movietracker/internal/service"
 
@@ -25,8 +26,14 @@ func NewApp() App {
 	}
 	app := iris.New()
 
+	db, err := cockroach.ConnectDB()
+	if err != nil {
+		panic("failed to parse config file")
+	}
+
 	searcher := repository.NewSearchRepository(cfg.SearcherURL)
-	svc := service.NewService(searcher)
+	user := repository.NewUserRepository(db)
+	svc := service.NewService(searcher, user)
 	service.NewServiceHandler(app, svc)
 
 	return App{
